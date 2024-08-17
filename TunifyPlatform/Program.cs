@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TunifyPlatform.Data;
 
 namespace TunifyPlatform
 {
@@ -9,7 +10,7 @@ namespace TunifyPlatform
             var builder = WebApplication.CreateBuilder(args);
             string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-            builder.Services.AddDbContext<EmployeeDbContext>(optionsX => optionsX.UseSqlServer(connectionString));
+            builder.Services.AddDbContext<TunifyPlatformDbContext>(optionsX => optionsX.UseSqlServer(connectionString));
             var app = builder.Build();
 
             app.MapGet("/", () => "Hello World!");
