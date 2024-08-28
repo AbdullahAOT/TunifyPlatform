@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TunifyPlatform.Data;
+using TunifyPlatform.Repositories.Interfaces;
+using TunifyPlatform.Repositories.Services;
 
 namespace TunifyPlatform
 {
@@ -8,11 +10,16 @@ namespace TunifyPlatform
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddControllers();
             string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
             builder.Services.AddDbContext<TunifyPlatformDbContext>(optionsX => optionsX.UseSqlServer(connectionString));
+            builder.Services.AddScoped<IArtists, ArtistService>();
+            builder.Services.AddScoped<IPlaylists, PlaylistService>();
+            builder.Services.AddScoped<ISongs, SongService>();
+            builder.Services.AddScoped<IUsers, UserService>();
             var app = builder.Build();
-
+            app.MapControllers();
             app.MapGet("/", () => "Hello World!");
 
             app.Run();
