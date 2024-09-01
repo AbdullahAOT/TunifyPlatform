@@ -63,6 +63,31 @@ namespace TunifyPlatform.Controllers
             await _playlistService.DeletePlaylist(id);
             return NoContent();
         }
+        [HttpPost("{playlistId}/songs/{songId}")]
+        public async Task<IActionResult> AddSongToPlaylist(int playlistId, int songId)
+        {
+            try
+            {
+                await _playlistService.AddSongToPlaylist(playlistId, songId);
+                return NoContent();
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet("{playlistId}/songs")]
+        public async Task<ActionResult<IEnumerable<Song>>> GetSongsForPlaylist(int playlistId)
+        {
+            var playlist = await _playlistService.GetPlaylistById(playlistId);
+            if (playlist == null)
+            {
+                return NotFound();
+            }
+            return Ok(playlist);
+        }
+
     }
 }
 

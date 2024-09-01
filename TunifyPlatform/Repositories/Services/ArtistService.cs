@@ -75,5 +75,19 @@ namespace TunifyPlatform.Repositories.Services
             // Return the updated artist
             return existingArtist;
         }
+        public async Task AddSongToArtist(int artistId, int songId)
+        {
+            var artist = await _context.Artist.Include(a => a.Songs).FirstOrDefaultAsync(a => a.Id == artistId);
+            var song = await _context.Song.FindAsync(songId);
+
+            if (artist == null || song == null)
+            {
+                throw new InvalidOperationException("Artist or Song not found");
+            }
+
+            artist.Songs.Add(song);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

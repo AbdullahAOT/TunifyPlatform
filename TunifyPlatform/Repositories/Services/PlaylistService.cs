@@ -56,5 +56,19 @@ namespace TunifyPlatform.Repositories.Services
         {
             return await _context.Playlist.FindAsync(id);
         }
+        public async Task AddSongToPlaylist(int playlistId, int songId)
+        {
+            var playlist = await _context.Playlist.Include(p => p.Songs).FirstOrDefaultAsync(p => p.Id == playlistId);
+            var song = await _context.Song.FindAsync(songId);
+
+            if (playlist == null || song == null)
+            {
+                throw new InvalidOperationException("Playlist or Song not found");
+            }
+
+            playlist.Songs.Add(song);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }
