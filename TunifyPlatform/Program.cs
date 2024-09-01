@@ -10,15 +10,24 @@ namespace TunifyPlatform
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddControllers();
-            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-            builder.Services.AddDbContext<TunifyPlatformDbContext>(optionsX => optionsX.UseSqlServer(connectionString));
+            // Add services to the container.
+            builder.Services.AddControllers();
+
+            // Configure database context
+            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddDbContext<TunifyPlatformDbContext>(options =>
+                options.UseSqlServer(connectionString));
+
+            // Register repository services
             builder.Services.AddScoped<IArtists, ArtistService>();
             builder.Services.AddScoped<IPlaylists, PlaylistService>();
             builder.Services.AddScoped<ISongs, SongService>();
             builder.Services.AddScoped<IUsers, UserService>();
+
             var app = builder.Build();
+
+            // Configure the HTTP request pipeline.
             app.MapControllers();
             app.MapGet("/", () => "Hello World!");
 
