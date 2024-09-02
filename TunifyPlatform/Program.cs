@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;  // Import this namespace
 using TunifyPlatform.Data;
 using TunifyPlatform.Repositories.Interfaces;
 using TunifyPlatform.Repositories.Services;
@@ -25,9 +26,29 @@ namespace TunifyPlatform
             builder.Services.AddScoped<ISongs, SongService>();
             builder.Services.AddScoped<IUsers, UserService>();
 
+            // Add Swagger services
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Tunify API",
+                    Version = "v1",
+                    Description = "API for managing playlists, songs, and artists in the Tunify Platform"
+                });
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Tunify API v1");
+                options.RoutePrefix = ""; // Set to an empty string to serve Swagger UI at the app's root
+            });
+
+            app.UseAuthorization();
+
             app.MapControllers();
             app.MapGet("/", () => "Hello World!");
 
