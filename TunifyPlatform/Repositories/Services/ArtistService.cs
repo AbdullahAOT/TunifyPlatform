@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TunifyPlatform.Data;
 using TunifyPlatform.Models;
 using TunifyPlatform.Repositories.Interfaces;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace TunifyPlatform.Repositories.Services
 {
@@ -17,64 +18,48 @@ namespace TunifyPlatform.Repositories.Services
 
         public async Task<Artist> CreateArtist(Artist artist)
         {
-            _context.Artist.AddAsync(artist);
+            _context.Artist.Add(artist);
             await _context.SaveChangesAsync();
             return artist;
         }
 
         public async Task DeleteArtist(int id)
         {
-            // Retrieve the artist by ID
             var existingArtist = await GetArtistById(id);
-
-            // Check if the artist exists
             if (existingArtist == null)
             {
                 throw new InvalidOperationException("Artist not found");
             }
-
-            // Remove the artist from the context
             _context.Artist.Remove(existingArtist);
-
-            // Save changes to the database
             await _context.SaveChangesAsync();
         }
 
         public async Task<List<Artist>> GetAllArtists()
         {
-            var allEmployees = await _context.Artist.ToListAsync();
-            return allEmployees;
+            return await _context.Artist.ToListAsync();
         }
 
         public async Task<Artist> GetArtistById(int id)
         {
-            var _artist = await _context.Artist.FindAsync(id);
-            return _artist;
+            return await _context.Artist.FindAsync(id);
         }
 
         public async Task<Artist> UpdateArtist(int id, Artist artist)
         {
-            // Retrieve the existing artist from the database
             var existingArtist = await _context.Artist.FindAsync(id);
-
-            // Check if the artist was found
             if (existingArtist == null)
             {
-                return null; // Return null or handle the scenario where the artist is not found
+                return null;
             }
 
-            // Update the existing artist's properties
             existingArtist.Name = artist.Name;
 
-            // Mark the entity as modified
             _context.Entry(existingArtist).State = EntityState.Modified;
-
-            // Save changes to the database
             await _context.SaveChangesAsync();
 
-            // Return the updated artist
             return existingArtist;
         }
+
         public async Task AddSongToArtist(int artistId, int songId)
         {
             var artist = await _context.Artist.Include(a => a.Songs).FirstOrDefaultAsync(a => a.Id == artistId);
@@ -88,6 +73,5 @@ namespace TunifyPlatform.Repositories.Services
             artist.Songs.Add(song);
             await _context.SaveChangesAsync();
         }
-
     }
 }

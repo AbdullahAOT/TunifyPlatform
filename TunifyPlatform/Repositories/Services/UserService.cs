@@ -1,61 +1,61 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TunifyPlatform.Data;
-using TunifyPlatform.Models;
+﻿using Microsoft.AspNetCore.Identity;
 using TunifyPlatform.Repositories.Interfaces;
+using TunifyPlatform.Models;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TunifyPlatform.Repositories.Services
 {
     public class UserService : IUsers
     {
-        private readonly TunifyPlatformDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public UserService(TunifyPlatformDbContext context)
+        public UserService(UserManager<IdentityUser> userManager)
         {
-            _context = context;
+            _userManager = userManager;
         }
 
-        public async Task<User> CreateUser(User user)
+        public async Task<IdentityUser> CreateUser(RegisterDto registerDto)
         {
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
-            return user;
+            var user = new IdentityUser { UserName = registerDto.Email, Email = registerDto.Email };
+            var result = await _userManager.CreateAsync(user, registerDto.Password);
+            if (result.Succeeded)
+            {
+                return user;
+            }
+            return null; // Handle errors appropriately
         }
 
-        public async Task<User> UpdateUser(int id, User user)
+        public async Task<IdentityUser> UpdateUser(string id, RegisterDto registerDto)
         {
-            var existingUser = await _context.User.FindAsync(id);
-            if (existingUser == null)
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
             {
                 return null;
             }
-
-            existingUser.FirstName = user.FirstName;
-            existingUser.LastName = user.LastName;
-            existingUser.Email = user.Email;
-
-            _context.Entry(existingUser).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return existingUser;
+            user.Email = registerDto.Email;
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded ? user : null;
         }
 
-        public async Task DeleteUser(int id)
+        public async Task DeleteUser(string id)
         {
-            var user = await _context.User.FindAsync(id);
+            var user = await _userManager.FindByIdAsync(id);
             if (user != null)
             {
-                _context.User.Remove(user);
-                await _context.SaveChangesAsync();
+                await _userManager.DeleteAsync(user);
             }
         }
 
-        public async Task<List<User>> GetAllUsers()
+        public async Task<List<IdentityUser>> GetAllUsers()
         {
-            return await _context.User.ToListAsync();
+            return _userManager.Users.ToList();
         }
 
-        public async Task<User> GetUserById(int id)
+        public async Task<IdentityUser> GetUserById(string id)
         {
-            return await _context.User.FindAsync(id);
+            return await _userManager.FindByIdAsync(id);
         }
     }
 }

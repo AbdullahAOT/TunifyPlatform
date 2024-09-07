@@ -1,13 +1,16 @@
-﻿using TunifyPlatform.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using TunifyPlatform.Models;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace TunifyPlatform.Repositories.Interfaces
 {
     public interface IUsers
     {
-        Task<User> CreateUser(User user);
-        Task<User> UpdateUser(int id, User user);
-        Task DeleteUser(int id);
-        Task<List<User>> GetAllUsers();
-        Task<User> GetUserById(int id);
+        Task<IdentityUser> CreateUser(RegisterDto registerDto);
+        Task<IdentityUser> UpdateUser(string id, RegisterDto registerDto);
+        Task DeleteUser(string id);
+        Task<List<IdentityUser>> GetAllUsers();
+        Task<IdentityUser> GetUserById(string id);
     }
 }

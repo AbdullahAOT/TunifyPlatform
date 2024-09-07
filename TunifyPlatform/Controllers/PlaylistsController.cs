@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TunifyPlatform.Data;
 using TunifyPlatform.Models;
 using TunifyPlatform.Repositories.Interfaces;
 
@@ -63,6 +58,7 @@ namespace TunifyPlatform.Controllers
             await _playlistService.DeletePlaylist(id);
             return NoContent();
         }
+
         [HttpPost("{playlistId}/songs/{songId}")]
         public async Task<IActionResult> AddSongToPlaylist(int playlistId, int songId)
         {
@@ -87,7 +83,5 @@ namespace TunifyPlatform.Controllers
             }
             return Ok(playlist);
         }
-
     }
 }
-
