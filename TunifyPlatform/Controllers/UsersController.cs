@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TunifyPlatform.Data;
+using Microsoft.AspNetCore.Identity;
 using TunifyPlatform.Models;
 using TunifyPlatform.Repositories.Interfaces;
 
@@ -23,13 +19,13 @@ namespace TunifyPlatform.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<IdentityUser>>> GetUsers()
         {
             return Ok(await _userService.GetAllUsers());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<IdentityUser>> GetUser(string id)
         {
             var user = await _userService.GetUserById(id);
             if (user == null)
@@ -40,16 +36,16 @@ namespace TunifyPlatform.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<IdentityUser>> PostUser(RegisterDto registerDto)
         {
-            var createdUser = await _userService.CreateUser(user);
-            return CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser);
+            var createdUser = await _userService.CreateUser(registerDto);
+            return createdUser != null ? CreatedAtAction(nameof(GetUser), new { id = createdUser.Id }, createdUser) : BadRequest("User creation failed.");
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(string id, RegisterDto registerDto)
         {
-            var updatedUser = await _userService.UpdateUser(id, user);
+            var updatedUser = await _userService.UpdateUser(id, registerDto);
             if (updatedUser == null)
             {
                 return NotFound();
@@ -58,11 +54,10 @@ namespace TunifyPlatform.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
             await _userService.DeleteUser(id);
             return NoContent();
         }
     }
 }
-

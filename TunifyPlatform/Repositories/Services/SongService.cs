@@ -2,6 +2,8 @@
 using TunifyPlatform.Data;
 using TunifyPlatform.Models;
 using TunifyPlatform.Repositories.Interfaces;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace TunifyPlatform.Repositories.Services
 {
