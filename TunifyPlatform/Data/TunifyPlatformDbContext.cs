@@ -32,7 +32,7 @@ namespace TunifyPlatform.Data
                 .WithMany(a => a.Songs)
                 .UsingEntity(j => j.ToTable("ArtistSongs"));
 
-            // Seed initial data
+            // Seed initial data for playlists, songs, and artists
             modelBuilder.Entity<Playlist>().HasData(
                 new Playlist { Id = 1, Name = "Chill Vibes", UserId = 1 }
             );
@@ -45,6 +45,35 @@ namespace TunifyPlatform.Data
             modelBuilder.Entity<Artist>().HasData(
                 new Artist { Id = 1, Name = "John Doe" },
                 new Artist { Id = 2, Name = "Jane Smith" }
+            );
+
+            // Seed initial roles
+            modelBuilder.Entity<IdentityRole>().HasData(
+                new IdentityRole { Id = "role-admin", Name = "Admin", NormalizedName = "ADMIN" },
+                new IdentityRole { Id = "role-user", Name = "User", NormalizedName = "USER" }
+            );
+
+            // Seed an admin user with a password and assign the admin role
+            var adminUser = new IdentityUser
+            {
+                Id = "admin-id",
+                UserName = "admin@tunify.com",
+                NormalizedUserName = "ADMIN@TUNIFY.COM",
+                Email = "admin@tunify.com",
+                NormalizedEmail = "ADMIN@TUNIFY.COM",
+                EmailConfirmed = true,
+                SecurityStamp = string.Empty
+            };
+
+            // Hash the password for the admin user
+            var passwordHasher = new PasswordHasher<IdentityUser>();
+            adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, "Admin@123");
+
+            modelBuilder.Entity<IdentityUser>().HasData(adminUser);
+
+            // Assign the admin role to the admin user
+            modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+                new IdentityUserRole<string> { UserId = adminUser.Id, RoleId = "role-admin" }
             );
         }
     }

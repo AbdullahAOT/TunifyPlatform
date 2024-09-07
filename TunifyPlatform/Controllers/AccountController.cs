@@ -2,6 +2,7 @@
 using TunifyPlatform.Models; // For RegisterDto and LoginDto
 using TunifyPlatform.Repositories.Interfaces; // For IAccount interface
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace TunifyPlatform.Controllers
 {
@@ -10,10 +11,12 @@ namespace TunifyPlatform.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccount _accountService;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public AccountController(IAccount accountService)
+        public AccountController(IAccount accountService, UserManager<IdentityUser> userManager)
         {
             _accountService = accountService;
+            _userManager = userManager;
         }
 
         [HttpPost("register")]
@@ -32,10 +35,14 @@ namespace TunifyPlatform.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var result = await _accountService.LoginUser(loginDto);
-            if (!result) return Unauthorized("Login failed");
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            if (user != null && await _accountService.LoginUser(loginDto))
+            {
+                var token = await _accountService.GenerateJwtToken(user);
+                return Ok(new { Token = token });
+            }
 
-            return Ok("Login successful");
+            return Unauthorized("Login failed");
         }
 
         [HttpPost("logout")]
