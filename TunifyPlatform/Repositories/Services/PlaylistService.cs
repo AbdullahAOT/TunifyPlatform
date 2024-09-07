@@ -4,6 +4,7 @@ using TunifyPlatform.Models;
 using TunifyPlatform.Repositories.Interfaces;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TunifyPlatform.Repositories.Services
 {
@@ -48,7 +49,7 @@ namespace TunifyPlatform.Repositories.Services
                 await _context.SaveChangesAsync();
             }
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<List<Playlist>> GetAllPlaylists()
         {
             return await _context.Playlist.ToListAsync();

@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TunifyPlatform.Models;
 using TunifyPlatform.Repositories.Interfaces;
 
 namespace TunifyPlatform.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SongsController : ControllerBase
